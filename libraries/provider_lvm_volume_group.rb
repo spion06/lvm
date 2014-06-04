@@ -69,13 +69,11 @@ class Chef
         pvs_to_add = []
         physical_volume_list.each do |pv_name|
           pv = lvm.physical_volumes[pv_name]
-          # make sure the PV specified is valid
-          Chef::Application.fatal!("#{pv_name} is not a valid LVM physical volume", 2) if pv.nil?
 
           # get the uuid of the VG the PV belongs to if it exists
-          pv_vg_uuid = pv.vg_uuid
+          pv_vg_uuid = pv.nil? ? nil : pv.vg_uuid
           if pv_vg_uuid.nil?
-            pvs_to_add.push pv
+            pvs_to_add.push pv_name
           else
             # raise an error if we attempt to add a PV that is already a member of a VG
             Chef::Application.fatal!("PV #{pv} is already a member of another volume group. Cannot add to #{name}",2) unless pv_vg_uuid == vg_uuid
